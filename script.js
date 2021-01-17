@@ -4,7 +4,7 @@ class Die {
         this.throw();
     }
 
-    throw () {
+    throw() {
         this.value = Math.floor(Math.random() * 6) + 1;
     }
 }
@@ -180,7 +180,7 @@ class Dice {
             this.dice_values[current_dice.value]++;
         }
     }
-    throw () {
+    throw() {
         for (let current_dice of this.dice_objects) {
             current_dice.throw();
         }
@@ -263,7 +263,7 @@ class Game {
                     acc[player_name] = [];
                 }
 
-                if (obj.classList.value === key) {
+                if (obj.className === key) {
                     acc[player_name].push(obj)
                 }
                 return acc;
@@ -273,18 +273,18 @@ class Game {
     }
     startGame() {
         swal("Select Game Mode:", {
-                buttons: {
-                    catch: {
-                        text: "Two Players",
-                        value: "two",
-                    },
-                    defeat: {
-                        text: "Four Players",
-                        value: "four",
-                    },
-                    cancel: "Cancel",
+            buttons: {
+                catch: {
+                    text: "Two Players",
+                    value: "two",
                 },
-            })
+                defeat: {
+                    text: "Four Players",
+                    value: "four",
+                },
+                cancel: "Cancel",
+            },
+        })
             .then((value) => {
                 switch (value) {
                     case "two":
@@ -308,8 +308,8 @@ class Game {
         // let player1 = prompt("Name of player one?");
         // let player2 = prompt("Name of player two?");
         swal("Name of player one?", {
-                content: "input",
-            })
+            content: "input",
+        })
             .then((player1) => {
                 let p1 = player1 == '' ? 'Player 1' : player1
                 this.addPlayer(p1);
@@ -333,8 +333,8 @@ class Game {
     }
     start_fourPlayers() {
         swal("Name of player one?", {
-                content: "input",
-            })
+            content: "input",
+        })
             .then((player1) => {
                 let p1 = player1 == '' ? 'Player 1' : player1
                 this.addPlayer(p1);
@@ -352,8 +352,8 @@ class Game {
                     player_two[1].innerHTML = p2;
                 }).then(() => {
                     swal("Name of player three?", {
-                            content: "input",
-                        })
+                        content: "input",
+                    })
                         .then((player3) => {
                             let p3 = player3 == '' ? 'Player 3' : player3
                             this.addPlayer(p3);
@@ -377,6 +377,50 @@ class Game {
                 })
             });
     }
+    test_groupBy(fields) {
+        let leng = this.players.length;
+        let group = this.players.map((player, player_index) =>
+            fields.reduce(function (acc, obj, index, array) {
+                if (leng >= player_index) {
+                    let key = array[player_index].className;
+                    let player_name = player.name;
+                    acc[player_name] = [...acc[player_name] || []];
+
+                    if (array[index].className == key) {
+                        (acc[player_name]).push(obj)
+                    }
+                }
+                return acc;
+            }, []))
+        let result = this.players.map((r, a) => {
+            let list_players = [];
+            list_players[r.name] = [...list_players[r.name] || []];
+            return list_players;
+        }, []);
+
+        console.log(group)
+
+        // let result = fields.reduce((r, a) => {
+        //     r[a.className] = [...r[a.className] || [], a];
+        //     return r;
+        // }, []);
+
+        // if (!list[p.name]) {
+        //     list.push(list[p.name] = []);
+        // }
+
+        // let rr = r.className.indexOf(key) !== -1
+        // if (rr) {
+        //     list[p.name].push(r);
+        // }
+
+        // let result = fields.reduce((r, a) => {
+        //     r[a.className] = r[a.className] || [];
+        //     r[a.className].push(a);
+        //     return r;
+        // }, Object.create(null));
+        return group;
+    }
 }
 /* End Class Game*/
 let dice_array = [2, 2, 2, 2, 2];
@@ -399,7 +443,8 @@ document.addEventListener("DOMContentLoaded", function (e) {
 
     function upper_section_table() {
         let fields = game.player_fields(upper_section);
-        console.log(fields)
+        // let fields = game.test_groupBy(upper_section);
+
         let dice = game.dices.dice_values;
         for (let p = 0; p < fields.length; p++) {
             const field = fields[p];
@@ -417,10 +462,11 @@ document.addEventListener("DOMContentLoaded", function (e) {
     function upper_section_sum() {
 
         let fields = game.player_fields(upper_section);
-        let sum_fields = game.player_fields(sum_bonus_section);
 
+        let sum_fields = game.player_fields(sum_bonus_section);
         for (let p = 0; p < fields.length; p++) {
             const field = fields[p];
+
             let player = game.players[p];
             let td = field[player.name];
 
@@ -428,8 +474,10 @@ document.addEventListener("DOMContentLoaded", function (e) {
             let td_sum = sum_f[player.name]
             for (let i = 0; i < td_sum.length; i++) {
                 const element = td_sum[i];
+
                 let sum = td.reduce(
                     (accumulator, currentValue) => accumulator + Number(currentValue.innerHTML), 0);
+
                 if (element.dataset.td == 'sum' && sum > 0) {
                     element.innerHTML = sum;
                 } else if (element.dataset.td == 'bonus' && sum >= 63) {
@@ -486,7 +534,7 @@ document.addEventListener("DOMContentLoaded", function (e) {
 
         let tooltiptext = document.createElement('span');
         tooltiptext.setAttribute('class', 'tooltiptext');
-        tooltiptext.style.visibility = 'visible'; // added to test
+        // tooltiptext.style.visibility = 'visible'; // added to test
         tooltiptext.innerHTML = '';
         tooltiptext.innerHTML = value;
 
@@ -500,6 +548,7 @@ document.addEventListener("DOMContentLoaded", function (e) {
             tooltiptext.innerHTML = ''
             tooltiptext.innerHTML = element.innerHTML
             element.appendChild(tooltiptext);
+            element.classList.add('choice')
         }
     }
 
@@ -507,8 +556,8 @@ document.addEventListener("DOMContentLoaded", function (e) {
         let tooltiptext = document.querySelectorAll('.tooltiptext');
         if (tooltiptext.length > 0) {
             for (const elem of tooltiptext) {
-                // elem.remove();
-                elem.style.visibility = 'hidden'; // Added to test
+                elem.remove();
+                // elem.style.visibility = 'hidden'; // Added to test
             }
         }
     }
@@ -532,12 +581,12 @@ document.addEventListener("DOMContentLoaded", function (e) {
         });
     }
     document.addEventListener('click', (e) => {
-
-        if (e.target.tagName == 'TD' && !e.target.hasAttribute('id')) {
+        if (e.target.classList.contains('choice') && !e.target.hasAttribute('id')) {
             e.target.innerHTML = e.target.textContent;
             e.target.setAttribute('id', 'take');
             remove_tooltiptext();
             remove_classChoice();
+            upper_section_sum();
             if (game.turns == 0) {
                 startbtn.removeAttribute('disabled', 'disabled');
                 game.change_player_turn();
@@ -556,7 +605,7 @@ document.addEventListener("DOMContentLoaded", function (e) {
             dice_checkBox(dice);
             remove_tooltiptext();
             upper_section_table();
-            upper_section_sum();
+
             lower_section_table();
             if (game.turns == 0) {
                 e.target.setAttribute('disabled', 'disabled');
